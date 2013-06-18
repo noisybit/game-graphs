@@ -1,0 +1,10 @@
+markdown: redcarpet
+pygments: true
+safe: true
+lsi: false
+permalink: /post/:title.html
+paginate: 3
+gravatar: "http://www.gravatar.com/avatar/60eae8f64ba46a9604c7124cabb7c472"
+twitter: "https://twitter.com/brainss_"
+github: "https://github.com/brainss"
+home: "/"
