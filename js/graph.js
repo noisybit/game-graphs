@@ -46,6 +46,7 @@ $(function() {
     x.domain(data.map(function(d, i) { return d.title}));
     y.domain([0, d3.max(data, function(d) { return d.rating })]);
 
+    console.log(data[0])
 
    svg.selectAll('.bar')
         .data(data)
@@ -55,7 +56,7 @@ $(function() {
         .attr('width', x.rangeBand())
         .attr('y', function(d) { return y(d.rating); })
         .attr('height', function(d) { return height - y(d.rating); })
-        .attr('fill', function(d,i) { return color(i) })
+        .attr('fill', function(d) { return color(d.genre) })
         .on('click', viewGame)
         .append('svg:title')
         .text(function(d) {
