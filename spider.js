@@ -21,6 +21,7 @@ spider()
 
   game.boxart = $('img.boxshot').attr('src');
   game.release = $('.pod_gameinfo li').eq(3).find('a').text().slice(0, -2);
+  game.genre = $('.crumb a').eq(1).text();
 
   db.incr('db.recordCount', function(err, key) {
     db.hmset('games:id:'+key, game, function(err) {
