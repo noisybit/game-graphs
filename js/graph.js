@@ -2,7 +2,7 @@ $(function() {
   var margin = {top: 20, right: 40, bottom: 20, left: 25};
   var width = window.innerWidth - margin.left - margin.right;
   var height = (window.innerHeight / 2)- margin.top - margin.bottom;
-  var barWidth = Math.floor(width / 30) - 1
+  var barWidth = Math.floor(width / 100) - 1
   var offset = 0;
 
   var color = d3.scale.category10();
@@ -22,6 +22,9 @@ $(function() {
         .rangeBands([0, width], .1, 0.7);
 
     var y = d3.scale.linear()
+        .range([height, 0]);
+
+    var yLine = d3.scale.linear()
         .range([height, 0]);
 
     var xAxis = d3.svg.axis()
@@ -45,8 +48,11 @@ $(function() {
 
     x.domain(data.map(function(d, i) { return d.title}));
     y.domain([0, d3.max(data, function(d) { return d.rating })]);
+    yLine.domain([0, d3.max(data, function(d) { return d.reviewCount })]);
 
-    console.log(data[0])
+    var line = d3.svg.line()
+        .x(function(d) { return x(d.title) })
+        .y(function(d) { return yLine(d.reviewCount) });
 
    svg.selectAll('.bar')
         .data(data)
@@ -57,13 +63,16 @@ $(function() {
         .attr('y', function(d) { return y(d.rating); })
         .attr('height', function(d) { return height - y(d.rating); })
         .attr('fill', function(d) { return color(d.genre) })
-        .on('click', viewGame)
+        .on('mouseover', viewGame)
         .append('svg:title')
         .text(function(d) {
           return 'Title: '+d.title+'\n'
           + 'Rating: ' +d.rating+'\n'
           + 'Reviewers: '+d.reviewCount
         })
+
+    svg.append('path')
+          .attr('d', line(data));
 
     /* Remove x-axis
     svg.append('g')
