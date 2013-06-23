@@ -1,44 +1,46 @@
 $(function() {
   var margin = {top: 20, right: 40, bottom: 20, left: 25};
-  var width = window.innerWidth - margin.left - margin.right;
+  var barWidth = Math.floor(window.innerWidth / 100) - 1
   var height = (window.innerHeight / 2)- margin.top - margin.bottom;
-  var barWidth = Math.floor(width / 100) - 1
-  var offset = 0;
-
   var color = d3.scale.category10();
+  var scrollSpeed = 60;
 
-  var svg = d3.select('#graph')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-    .append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+  var yBar = d3.scale.linear()
+      .range([height, 0]);
 
+  var yBarAxis = d3.svg.axis()
+      .scale(yBar)
+      .orient('left')
+      .tickFormat(d3.format())
 
+  var yLine = d3.scale.linear()
+      .range([height, 0]);
+
+  var yLineAxis = d3.svg.axis()
+      .scale(yLine)
+      .orient('right')
+      .tickFormat(d3.format())
+
+  // Grab the data
   d3.json('/data/rated.json', function(err, data) {
 
-    width = data.length * barWidth;
+    var width = (data.length * barWidth) - margin.left - margin.right;
 
+    // Create the graph and offset by margins
+    var svg = d3.select('#graph')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+      .append('g')
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+    // Create the x scale
     var x = d3.scale.ordinal()
         .rangeBands([0, width], .1, 0.7);
 
-    var y = d3.scale.linear()
-        .range([height, 0]);
-
-    var yLine = d3.scale.linear()
-        .range([height, 0]);
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient('bottom')
-
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient('left')
-        .tickFormat(d3.format())
-
-    data = data.sort(function(a, b) {
-      return b.reviewCount - a.reviewCount;
-    })
+    // Setup the line graph
+    var line = d3.svg.line()
+        .x(function(d) { return x(d.title) })
+        .y(function(d) { return yLine(d.reviewCount) });
 
     // Convert strings to numbers
     data.forEach(function(d) {
@@ -46,66 +48,78 @@ $(function() {
       d.reviewCount = +d.reviewCount;
     })
 
-    x.domain(data.map(function(d, i) { return d.title}));
-    y.domain([0, d3.max(data, function(d) { return d.rating })]);
-    yLine.domain([0, d3.max(data, function(d) { return d.reviewCount })]);
+    // Sort by number of reviews
+    data = data.sort(function(a, b) {
+      return b.reviewCount - a.reviewCount;
+    })
 
-    var line = d3.svg.line()
-        .x(function(d) { return x(d.title) })
-        .y(function(d) { return yLine(d.reviewCount) });
+    // Scale the domains
+    x.domain(data.map(function(d, i) { return d.title; }));
+    yBar.domain([0, d3.max(data, function(d) { return d.rating; })]);
+    yLine.domain([0, d3.max(data, function(d) { return d.reviewCount; })]);
 
-   svg.selectAll('.bar')
+    // Draw the bar graph
+    svg.selectAll('.bar')
         .data(data)
       .enter().append('rect')
         .attr('class', 'bar')
-        .attr('x', function(d) { return x(d.title) + offset})
+        .attr('x', function(d) { return x(d.title); })
         .attr('width', x.rangeBand())
-        .attr('y', function(d) { return y(d.rating); })
-        .attr('height', function(d) { return height - y(d.rating); })
-        .attr('fill', function(d) { return color(d.genre) })
+        .attr('y', function(d) { return yBar(d.rating); })
+        .attr('height', function(d) { return height - yBar(d.rating); })
+        .attr('fill', function(d) { return color(d.genre); })
         .on('mouseover', viewGame)
         .append('svg:title')
         .text(function(d) {
           return 'Title: '+d.title+'\n'
           + 'Rating: ' +d.rating+'\n'
           + 'Reviewers: '+d.reviewCount
+          + 'Genre: '+d.genre
         })
 
+    // Draw the line graph
     svg.append('path')
+          .attr('class', '.line')
           .attr('d', line(data));
 
-    /* Remove x-axis
+    // Draw the yBarAxis
     svg.append('g')
-        .attr('class', 'x axis')
-        .attr('transform', 'translate(0,' + height + ')')
-        .call(xAxis)
-        .selectAll('text')
-          .style('text-anchor', 'start')
-          .attr('transform', 'rotate(65)')
-    */
-
-   svg.append('g')
-        .attr('class', 'y axis')
-        .call(yAxis)
+        .attr('class', 'yAxis yBarAxis')
+        .call(yBarAxis)
       .append('text')
-        .attr('transform', 'rotate(-90)')
-        .attr('y', 6)
+        .attr('y', -12)
+        .attr('x', 6)
         .attr('dy', '.71em')
-        .style('text-anchor', 'end')
+        .style('text-anchor', 'start')
         .text('Rating');
 
-    $('#graph').bind('mousewheel', function(e, delta) {
-      var updated = offset + (delta * 65);
-      offset = updated > 0 || updated < -width ? offset : updated;
-      console.log(offset, delta)
-      drawGraph();
-    })
+    // Draw the yLineAxis
+    svg.append('g')
+        .attr('class', 'yAxis yLineAxis')
+        .attr('transform', 'translate('+(window.innerWidth - margin.right - 40)+',0)')
+        .call(yLineAxis)
+      .append('text')
+        .attr('y', -12)
+        .attr('x', -6)
+        .attr('dy', '.71em')
+        .style('text-anchor', 'end')
+        .text('Reviews');
 
-    function drawGraph() {
-      svg.selectAll('.bar')
-          .data(data)
-        .attr('x', function(d) { return x(d.title) + offset})
-    }
+    $('#graph').bind('mousewheel', function(e, delta) {
+      var x = window.scrollX || window.screenLeft;
+      var y = window.scrollY || window.screenTop;
+      var scroll = (-delta * scrollSpeed);
+
+      // Move the screen
+      window.scrollTo(x + scroll, y);
+
+      //Move the yAxis
+      svg.select('.yBarAxis')
+          .attr('transform', function(){ return 'translate('+(x+scroll)+', 0)'})
+
+      svg.select('.yLineAxis')
+          .attr('transform', function(){ return 'translate('+(window.innerWidth - margin.right - 40 + x + scroll)+',0)';})
+    })
 
     function viewGame(d) {
       $info = $('#gameInfo');

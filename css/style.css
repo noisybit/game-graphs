@@ -3,3 +3,17 @@ path {
   stroke-width: 2;
   fill: none;
 }
+
+#gameInfo {
+  position: fixed;
+}
+
+.yBarAxis {
+  position: fixed;
+  left: 0;
+}
+
+.yLineAxis {
+  position: fixed;
+  right: 0;
+}
