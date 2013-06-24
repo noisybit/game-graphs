@@ -5,7 +5,9 @@ path {
 }
 
 #gameInfo {
-  position: fixed;
+  background-color: white;
+  position: absolute;
+  display: none;
 }
 
 .yBarAxis {

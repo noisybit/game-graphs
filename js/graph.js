@@ -1,9 +1,19 @@
 $(function() {
   var margin = {top: 20, right: 40, bottom: 20, left: 25};
-  var barWidth = Math.floor(window.innerWidth / 100) - 1
-  var height = (window.innerHeight / 2)- margin.top - margin.bottom;
+  var width = window.innerWidth - margin.left - margin.right;
+  var height = (window.innerHeight / 1.5)- margin.top - margin.bottom;
+  var bars = 100;
+  var barWidth = Math.floor(width / bars) - 1
   var color = d3.scale.category10();
-  var scrollSpeed = 60;
+  var scrollSpeed = 8;
+  var index = 0;
+
+  // Create the graph and offset by margins
+  var svg = d3.select('#graph')
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
   var yBar = d3.scale.linear()
       .range([height, 0]);
@@ -21,26 +31,17 @@ $(function() {
       .orient('right')
       .tickFormat(d3.format())
 
+  // Create the x scale
+  var x = d3.scale.ordinal()
+      .rangeBands([0, width], .1, 0.7);
+
+  // Setup the line graph
+  var line = d3.svg.line()
+      .x(function(d, i) { return x(i) })
+      .y(function(d) { return yLine(d.reviewCount) });
+
   // Grab the data
   d3.json('/data/rated.json', function(err, data) {
-
-    var width = (data.length * barWidth) - margin.left - margin.right;
-
-    // Create the graph and offset by margins
-    var svg = d3.select('#graph')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
-      .append('g')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-    // Create the x scale
-    var x = d3.scale.ordinal()
-        .rangeBands([0, width], .1, 0.7);
-
-    // Setup the line graph
-    var line = d3.svg.line()
-        .x(function(d) { return x(d.title) })
-        .y(function(d) { return yLine(d.reviewCount) });
 
     // Convert strings to numbers
     data.forEach(function(d) {
@@ -54,33 +55,9 @@ $(function() {
     })
 
     // Scale the domains
-    x.domain(data.map(function(d, i) { return d.title; }));
-    yBar.domain([0, d3.max(data, function(d) { return d.rating; })]);
-    yLine.domain([0, d3.max(data, function(d) { return d.reviewCount; })]);
-
-    // Draw the bar graph
-    svg.selectAll('.bar')
-        .data(data)
-      .enter().append('rect')
-        .attr('class', 'bar')
-        .attr('x', function(d) { return x(d.title); })
-        .attr('width', x.rangeBand())
-        .attr('y', function(d) { return yBar(d.rating); })
-        .attr('height', function(d) { return height - yBar(d.rating); })
-        .attr('fill', function(d) { return color(d.genre); })
-        .on('mouseover', viewGame)
-        .append('svg:title')
-        .text(function(d) {
-          return 'Title: '+d.title+'\n'
-          + 'Rating: ' +d.rating+'\n'
-          + 'Reviewers: '+d.reviewCount
-          + 'Genre: '+d.genre
-        })
-
-    // Draw the line graph
-    svg.append('path')
-          .attr('class', '.line')
-          .attr('d', line(data));
+    x.domain([0, bars]);
+    yBar.domain([0, 10]);
+    yLine.domain([0, 1000]);
 
     // Draw the yBarAxis
     svg.append('g')
@@ -105,29 +82,71 @@ $(function() {
         .style('text-anchor', 'end')
         .text('Reviews');
 
+    render();
+    function render() {
+      var visible = data.slice(index, index+bars);
+      x.domain(visible.map(function(d){ return d.title; }));
+
+      // Draw the bar graph
+      var bargraph = svg.selectAll('.bar')
+            .data(visible)
+
+      bargraph.enter().append('rect')
+          .attr('class', 'bar')
+          .attr('width', x.rangeBand())
+          .on('mouseover', showTooltip)
+          .on('mousemove', moveTooltip)
+          .on('mouseout', hideTooltip)
+
+      bargraph
+        .attr('x', function(d, i) { return x(d.title); })
+        .attr('y', function(d) { return yBar(d.rating); })
+        .attr('height', function(d) { return height - yBar(d.rating); })
+        .attr('fill', function(d) { return color(d.genre); })
+
+
+      // Draw the line graph
+      var lines =  svg.selectAll('.line')
+          .data(visible)
+          .attr('d', line(visible))
+
+      lines.enter().append('path').attr('class', 'line')
+      lines.attr('d', line(visible));
+      lines.exit().remove();
+
+      yLine.domain([0, d3.max(visible, function(d) { return d.reviewCount; })]);
+      svg.select('.yLineAxis').call(yLine);
+    }
+
     $('#graph').bind('mousewheel', function(e, delta) {
-      var x = window.scrollX || window.screenLeft;
-      var y = window.scrollY || window.screenTop;
-      var scroll = (-delta * scrollSpeed);
-
-      // Move the screen
-      window.scrollTo(x + scroll, y);
-
-      //Move the yAxis
-      svg.select('.yBarAxis')
-          .attr('transform', function(){ return 'translate('+(x+scroll)+', 0)'})
-
-      svg.select('.yLineAxis')
-          .attr('transform', function(){ return 'translate('+(window.innerWidth - margin.right - 40 + x + scroll)+',0)';})
+      var scrollBy = -delta * scrollSpeed
+      var newIndex = index + scrollBy;
+      index = (newIndex >= 0 && newIndex < data.length - bars) ? newIndex: index;
+      render();
     })
 
-    function viewGame(d) {
-      $info = $('#gameInfo');
-      $info.find('#title').html(d.title);
-      $info.find('#boxart').attr('src', d.boxart);
-      $info.find('#rating').html(d.rating);
-      $info.find('#reviews').html(d.reviewCount);
+    var $tooltip = $('#gameInfo');
+    function showTooltip(d) {
+      setTooltip(d);
+      $tooltip.show();
+    }
+
+    function hideTooltip() {
+      $tooltip.hide();
+    }
+
+    function moveTooltip() {
+      $tooltip.css('top', (event.pageY-10)+"px").css('left', (event.pageX+10)+"px")
+    }
+
+    function setTooltip(d) {
+      $tooltip.find('#title').html(d.title);
+      $tooltip.find('#boxart').attr('src', d.boxart);
+      $tooltip.find('#rating').html(d.rating);
+      $tooltip.find('#reviews').html(d.reviewCount);
     }
   })
+
+  $(document).tooltip({track: true, content: 'WAht'});
 
 })
