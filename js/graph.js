@@ -54,6 +54,7 @@ $(function() {
       return b.reviewCount - a.reviewCount;
     })
 
+
     // Scale the domains
     x.domain([0, bars]);
     yBar.domain([0, 10]);
@@ -117,6 +118,26 @@ $(function() {
       yLine.domain([0, d3.max(visible, function(d) { return d.reviewCount; })]);
       svg.select('.yLineAxis').call(yLine);
     }
+
+    // Draw the legend
+    var legend = svg.append('g')
+          .attr('y', height + margin.top)
+          .attr('x', margin.left)
+
+
+    legend.selectAll('g')
+          .data(color.domain())
+            .append('g')
+              .attr('class', 'legend')
+            .append('rect')
+              .attr('width', 5)
+              .attr('height', 5)
+              .attr('fill', function(d){ color.domain(d) })
+            .append('text')
+              .attr('x', 10)
+              .attr('dy', '.71em')
+              .style('text-anchor', 'start')
+              .text(function(d){ return d; });
 
     $('#graph').bind('mousewheel', function(e, delta) {
       var scrollBy = -delta * scrollSpeed

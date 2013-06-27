@@ -1,3 +1,11 @@
+body {
+  background-color: gainsboro;
+}
+
+h1 {
+  color: blueviolet;
+}
+
 path {
   stroke: black;
   stroke-width: 2;
@@ -5,10 +13,28 @@ path {
 }
 
 #gameInfo {
-  background-color: white;
+  background-color: silver;
   position: absolute;
   display: none;
+  padding: 0.5em;
+  border-radius: 3px;
 }
+
+#gameInfo img {
+  float: left;
+  padding-right: 1em;
+}
+
+#description {
+  font-color: gainsboro;
+  font-size: 1.5em;
+  background-color: blueviolet;
+}
+
+#gameInfo .score {
+  display: block;
+}
+
 
 .yBarAxis {
   position: fixed;
