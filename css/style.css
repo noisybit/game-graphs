@@ -18,17 +18,20 @@ path {
   display: none;
   padding: 0.5em;
   border-radius: 3px;
+  max-width: 30em;
+  min-width: 20em;
 }
 
 #gameInfo img {
   float: left;
   padding-right: 1em;
+  display: block;
 }
 
 #description {
-  font-color: gainsboro;
   font-size: 1.5em;
   background-color: blueviolet;
+  display: inline;
 }
 
 #gameInfo .score {
@@ -44,4 +47,12 @@ path {
 .yLineAxis {
   position: fixed;
   right: 0;
+}
+
+.explaination {
+  padding: 3em;
+}
+
+li {
+  list-style-type: none;
 }

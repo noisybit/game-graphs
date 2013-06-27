@@ -8,15 +8,23 @@
   <body>
     <h1>Super Nintendo Ratings</h1>
     <svg id='graph'></svg>
-    <div>
+    <div class='explaination'>
       <p>
-        A series of Super Nintendo game ratings ordered by number of reviews. The data for this was from gameFAQs on 6/22/2013
+        A series of Super Nintendo game ratings ordered by number of reviews.
+        Source: <a href='http://www.gamefaqs.com/snes'>GameFAQs</a>
       </p>
+      <svg id='legend'>
+      </svg>
     </div>
     <div id='gameInfo'>
       <h2 id='title'></h2>
       <img id='boxart'>
-      <p id='description'><span class='score'><span id='rating'></span>/10<span> from <span id='reviews'></span> reviews</p>
+      <div id='description'>
+        <ul>
+          <li><span id='rating'></span> / 10</li>
+          <li><span id='reviews'></span> reviews</li>
+        </ul>
+      </div>
     </div>
     <script type='text/javascript' src='/js/d3.js'></script>
     <script type='text/javascript' src='/js/jquery.js'></script>

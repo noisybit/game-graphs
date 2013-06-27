@@ -2,7 +2,7 @@ $(function() {
   var margin = {top: 20, right: 40, bottom: 20, left: 25};
   var width = window.innerWidth - margin.left - margin.right;
   var height = (window.innerHeight / 1.5)- margin.top - margin.bottom;
-  var bars = 100;
+  var bars = 75;
   var barWidth = Math.floor(width / bars) - 1
   var color = d3.scale.category10();
   var scrollSpeed = 8;
@@ -51,14 +51,19 @@ $(function() {
 
     // Sort by number of reviews
     data = data.sort(function(a, b) {
-      return b.reviewCount - a.reviewCount;
+      var reviews = b.reviewCount - a.reviewCount;
+      // if equal reviewCount, sort by rating
+      if(reviews === 0)
+        return b.rating - a.rating;
+      else
+        return reviews;
     })
 
 
     // Scale the domains
     x.domain([0, bars]);
     yBar.domain([0, 10]);
-    yLine.domain([0, 1000]);
+    yLine.domain([0, d3.max(data, function(d) { return d.reviewCount; })]);
 
     // Draw the yBarAxis
     svg.append('g')
@@ -106,6 +111,7 @@ $(function() {
         .attr('fill', function(d) { return color(d.genre); })
 
 
+
       // Draw the line graph
       var lines =  svg.selectAll('.line')
           .data(visible)
@@ -115,30 +121,33 @@ $(function() {
       lines.attr('d', line(visible));
       lines.exit().remove();
 
-      yLine.domain([0, d3.max(visible, function(d) { return d.reviewCount; })]);
-      svg.select('.yLineAxis').call(yLine);
+      svg.select('yLineAxis')
+        .call(yLineAxis);
     }
 
     // Draw the legend
-    var legend = svg.append('g')
-          .attr('y', height + margin.top)
-          .attr('x', margin.left)
+    var legend = d3.select('#legend')
+          .attr('width', 150)
+          .attr('height', 150)
 
-
-    legend.selectAll('g')
-          .data(color.domain())
+    var nodes = legend.selectAll('g')
+          .data(color.domain()).enter()
             .append('g')
               .attr('class', 'legend')
-            .append('rect')
-              .attr('width', 5)
-              .attr('height', 5)
-              .attr('fill', function(d){ color.domain(d) })
-            .append('text')
-              .attr('x', 10)
-              .attr('dy', '.71em')
-              .style('text-anchor', 'start')
-              .text(function(d){ return d; });
+              .attr('transform', function(d, i) { return 'translate(0, '+i*16+')';})
 
+    nodes.append('rect')
+          .attr('width', 10)
+          .attr('height', 10)
+          .attr('fill', function(d){ return color(d) })
+
+    nodes.append('text')
+          .attr('x', 13)
+          .attr('dy', '.71em')
+          .style('text-anchor', 'start')
+          .text(function(d){ return d; });
+
+    // Offset data when mouse is scrolled
     $('#graph').bind('mousewheel', function(e, delta) {
       var scrollBy = -delta * scrollSpeed
       var newIndex = index + scrollBy;
@@ -157,7 +166,7 @@ $(function() {
     }
 
     function moveTooltip() {
-      $tooltip.css('top', (event.pageY-10)+"px").css('left', (event.pageX+10)+"px")
+      $tooltip.css('top', (d3.event.pageY-10)+"px").css('left', (d3.event.pageX+10)+"px")
     }
 
     function setTooltip(d) {
@@ -167,7 +176,4 @@ $(function() {
       $tooltip.find('#reviews').html(d.reviewCount);
     }
   })
-
-  $(document).tooltip({track: true, content: 'WAht'});
-
 })
