@@ -1,7 +1,7 @@
 $(function() {
   var margin = {top: 20, right: 40, bottom: 20, left: 25};
   var width = window.innerWidth - margin.left - margin.right;
-  var height = (window.innerHeight / 1.5)- margin.top - margin.bottom;
+  var height = (window.innerHeight / 1.8)- margin.top - margin.bottom;
   var bars = 75;
   var barWidth = Math.floor(width / bars) - 1
   var color = d3.scale.category10();
