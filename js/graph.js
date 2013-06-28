@@ -1,8 +1,8 @@
 $(function() {
-  var margin = {top: 20, right: 40, bottom: 20, left: 25};
+  var margin = {top: 20, right: 40, bottom: 60, left: 25};
   var width = window.innerWidth - margin.left - margin.right;
   var height = (window.innerHeight / 1.8)- margin.top - margin.bottom;
-  var bars = 75;
+  var bars = 1400;
   var barWidth = Math.floor(width / bars) - 1
   var color = d3.scale.category10();
   var scrollSpeed = 8;
@@ -14,7 +14,7 @@ $(function() {
       .attr('height', height + margin.top + margin.bottom)
     .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
+      
   var yBar = d3.scale.linear()
       .range([height, 0]);
 
@@ -33,7 +33,12 @@ $(function() {
 
   // Create the x scale
   var x = d3.scale.ordinal()
-      .rangeBands([0, width], .1, 0.7);
+      .rangeBands([0, width], 0.1);
+
+  var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient('bottom')
+      .tickPadding(0.7)
 
   // Setup the line graph
   var line = d3.svg.line()
@@ -60,8 +65,8 @@ $(function() {
     })
 
 
+
     // Scale the domains
-    x.domain([0, bars]);
     yBar.domain([0, 10]);
     yLine.domain([0, d3.max(data, function(d) { return d.reviewCount; })]);
 
@@ -76,6 +81,12 @@ $(function() {
         .style('text-anchor', 'start')
         .text('Rating');
 
+    svg.append('g')
+        .attr('class', 'xAxis')
+        .attr('transform', 'translate(0,'+(height)+')')
+
+
+    /*
     // Draw the yLineAxis
     svg.append('g')
         .attr('class', 'yAxis yLineAxis')
@@ -87,11 +98,12 @@ $(function() {
         .attr('dy', '.71em')
         .style('text-anchor', 'end')
         .text('Reviews');
+    */
 
     render();
     function render() {
       var visible = data.slice(index, index+bars);
-      x.domain(visible.map(function(d){ return d.title; }));
+      x.domain(visible.map(function(d, i){ return d.title; }));
 
       // Draw the bar graph
       var bargraph = svg.selectAll('.bar')
@@ -110,8 +122,7 @@ $(function() {
         .attr('height', function(d) { return height - yBar(d.rating); })
         .attr('fill', function(d) { return color(d.genre); })
 
-
-
+        /*
       // Draw the line graph
       var lines =  svg.selectAll('.line')
           .data(visible)
@@ -123,6 +134,7 @@ $(function() {
 
       svg.select('yLineAxis')
         .call(yLineAxis);
+        */
     }
 
     // Draw the legend
