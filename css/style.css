@@ -1,5 +1,6 @@
 body {
   background-color: gainsboro;
+  overflow-x: hidden;
 }
 
 h1 {
@@ -56,4 +57,8 @@ path {
 
 li {
   list-style-type: none;
+}
+
+.slider {
+  margin: 10px;
 }
