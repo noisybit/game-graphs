@@ -39,28 +39,32 @@ var GRAPH = (function(graph) {
 
 
     $(document).ready(function() {
-      var $review = $('#reviewSlider').slider({range: true, values: [0, 100]})
+      var $review = $('#reviewSlider').slider({range: true, values: [0, 10]})
         .on('slide', function(e, ui) {
           var max = Math.floor(ui.values[0]/100 * (sortByReviews.length -1))
           var min = Math.floor(ui.values[1]/100 * (sortByReviews.length -1))
           console.log(max, min, sortByReviews.length, ui.values)
           review.max = sortByReviews[max].reviewCount;
           review.min = sortByReviews[min].reviewCount;
+          $('h3.review').html(review.max+' > reviews > '+review.min);
           render();
         });
 
-      var $rating = $('#ratingSlider').slider({range: true, values: [0, 100]})
+      var $rating = $('#ratingSlider').slider({range: true, values: [0, 10]})
         .on('slide', function(e, ui) {
           rating.max = sortByRatings[Math.floor(ui.values[0]/100 * (sortByRatings.length -1))].rating;
           rating.min = sortByRatings[Math.floor(ui.values[1]/100 * (sortByRatings.length -1))].rating;
+          $('h3.rating').html(rating.max+' > ratings > '+rating.min);
           render();
         })
+
+      $('h3.rating').html(rating.max+' > ratings > '+rating.min);
+      $('h3.review').html(review.max+' > reviews > '+review.min);
 
       render();
     })
 
     function render() {
-    console.log(review, rating)
       graph.sortByRatings(sortByRatings.filter(function(d){ 
         return d.reviewCount >= review.min && d.reviewCount <= review.max
                && d.rating >= rating.min && d.rating <= rating.max;
