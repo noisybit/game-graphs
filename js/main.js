@@ -1,5 +1,7 @@
 var GRAPH = (function(graph) {
 
+  graph.color = d3.scale.category10();
+
   d3.json('/data/rated.json', function(err, data) {
 
     // Convert strings to numbers
@@ -8,74 +10,139 @@ var GRAPH = (function(graph) {
       d.reviewCount = +d.reviewCount;
     })
 
-    // Sort by number of reviews
-    var reviews;
-    var rating;
-    var sortByReviews = data.sort(function(a, b) {
-      reviews = b.reviewCount - a.reviewCount;
-      // if equal reviewCount, sort by rating
-      if(reviews === 0)
-        return b.rating - a.rating;
-      else
-        return reviews;
+    // Sort
+    var sorted= graph.sorted = {
+      reviews: data.slice(0),
+      ratings: data.slice(0).sort(function(a, b){ return b.rating - a.rating})
+    };
+
+    sorted.reviews.sort(function(a, b) {
+      var reviews = b.reviewCount - a.reviewCount;
+      return (reviews === 0) ? b.rating - a.rating : reviews;
     })
 
-    // Sort by rating then by reviews
-    var sortByRatings = sortByReviews.slice(0).sort(function(a, b) {
-      rating = b.rating - a.rating;
-      // if equal reviewCount, sort by rating
-      if(rating === 0)
-        return b.reviewCount - a.reviewCount;
-      else
-        return rating;
-    })
+      var slider = {
+        reviews: [],
+        ratings: []
+      }
+      //
+      // Get all unique values
+      sorted.reviews.forEach(function(d) {
+        if(slider.reviews.indexOf(d.reviewCount) < 0)
+          slider.reviews.push(d.reviewCount);
+      })
 
+      // Get all unique values
+      sorted.ratings.forEach(function(d) {
+        if(slider.ratings.indexOf(d.rating) < 0)
+          slider.ratings.push(d.rating);
+      })
 
-    var mostReviews = d3.max(data, function(d){ return d.reviewCount;})
-    var mostRatings  = 10;
-    var review = {max: mostReviews,  min: 0};
-    var rating = {max: mostRatings, min: 0}
+      var filter = graph.filter = {
+        reviews: [slider.reviews[100], slider.reviews[0]],
+        ratings: [slider.ratings[40], slider.ratings[0]]
+      };
 
+      var $tooltip = $('#gameInfo');
+      graph.showTooltip = function (d) {
+        $tooltip.find('#title').html(d.title);
+        $tooltip.find('#boxart').attr('src', d.boxart);
+        $tooltip.find('#rating').html(d.rating);
+        $tooltip.find('#reviews').html(d.reviewCount);
+        $tooltip.show();
+      }
 
+      graph.hideTooltip = function() {
+        $tooltip.hide()
+      }
+
+      graph.moveTooltip = function() {
+        var yOffset = d3.event.pageY-10;
+        var xOffset = d3.event.pageX+10;
+        var width = $tooltip[0].scrollWidth;
+        if(width + xOffset > window.innerWidth) 
+          $tooltip.css('top', yOffset+"px").css('left', (xOffset - 20 - width)+"px")
+        else
+          $tooltip.css('top', yOffset+"px").css('left', xOffset+"px")
+      }
 
     $(document).ready(function() {
-      var $review = $('#reviewSlider').slider({range: true, values: [0, 10]})
+
+      graph.reviews = graph.bargraph({
+        svg: '#reviews',
+        xLabel: 'Reviews',
+        yLabel: 'Ratings',
+        xSelector: 'reviewCount',
+        yMax: 'rating',
+        yInput: 'rating'
+      });
+
+      graph.ratings = graph.bargraph({
+        svg: '#ratings',
+        xLabel: 'Ratings',
+        yLabel: 'Reviews',
+        xSelector: 'rating',
+        yMax: 'reviewCount',
+        yInput: 'reviewCount'
+      });
+
+      $('#reviewSlider')
+        .slider({range: true, values: [0, 100], min: 0, max: slider.reviews.length-1})
         .on('slide', function(e, ui) {
-          var max = Math.floor(ui.values[0]/100 * (sortByReviews.length -1))
-          var min = Math.floor(ui.values[1]/100 * (sortByReviews.length -1))
-          console.log(max, min, sortByReviews.length, ui.values)
-          review.max = sortByReviews[max].reviewCount;
-          review.min = sortByReviews[min].reviewCount;
-          $('h3.review').html(review.max+' > reviews > '+review.min);
+          filter.reviews[0] = slider.reviews[ui.values[1]]; // Min
+          filter.reviews[1] = slider.reviews[ui.values[0]]; // Max
+          $('h3.review').html(filter.reviews[1]+' > reviews > '+filter.reviews[0]);
           render();
         });
 
-      var $rating = $('#ratingSlider').slider({range: true, values: [0, 10]})
+      $('#ratingSlider')
+        .slider({range: true, values: [0, 40], min: 0, max: slider.ratings.length-1})
         .on('slide', function(e, ui) {
-          rating.max = sortByRatings[Math.floor(ui.values[0]/100 * (sortByRatings.length -1))].rating;
-          rating.min = sortByRatings[Math.floor(ui.values[1]/100 * (sortByRatings.length -1))].rating;
-          $('h3.rating').html(rating.max+' > ratings > '+rating.min);
+          filter.ratings[0] = slider.ratings[ui.values[1]]; // Min
+          filter.ratings[1] = slider.ratings[ui.values[0]]; // Max
+          $('h3.rating').html(filter.ratings[1]+' > ratings > '+filter.ratings[0]);
           render();
         })
 
-      $('h3.rating').html(rating.max+' > ratings > '+rating.min);
-      $('h3.review').html(review.max+' > reviews > '+review.min);
+      $('h3.rating').html(filter.ratings[1]+' > ratings > '+filter.ratings[0]);
+      $('h3.review').html(filter.reviews[1]+' > reviews > '+filter.reviews[0]);
 
       render();
     })
 
     function render() {
-      graph.sortByRatings(sortByRatings.filter(function(d){ 
-        return d.reviewCount >= review.min && d.reviewCount <= review.max
-               && d.rating >= rating.min && d.rating <= rating.max;
-      }));
-
-      graph.sortByReviews(sortByReviews.filter(function(d){ 
-        return d.reviewCount >= review.min && d.reviewCount <= review.max
-               && d.rating >= rating.min && d.rating <= rating.max;
-      }));
+      graph.reviews.render(sorted.reviews.filter(filterData));
+      graph.ratings.render(sorted.ratings.filter(filterData));
     }
 
+    function filterData(d) {
+      return d.reviewCount >= filter.reviews[0]
+          && d.reviewCount <= filter.reviews[1]
+          && d.rating >= filter.ratings[0]
+          && d.rating <= filter.ratings[1];
+    }
+    //
+      // Draw the legend
+      var legend = d3.select('#legend')
+            .attr('width', 150)
+            .attr('height', 150)
+
+      var nodes = legend.selectAll('g')
+            .data(graph.color.domain()).enter()
+              .append('g')
+                .attr('class', 'legend')
+                .attr('transform', function(d, i) { return 'translate(0, '+i*16+')';})
+
+      nodes.append('rect')
+            .attr('width', 10)
+            .attr('height', 10)
+            .attr('fill', function(d){ return graph.color(d) })
+
+      nodes.append('text')
+            .attr('x', 13)
+            .attr('dy', '.71em')
+            .style('text-anchor', 'start')
+            .text(function(d){ return d; });
   })
 
   return graph;

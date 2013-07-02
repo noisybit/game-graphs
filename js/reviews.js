@@ -3,7 +3,6 @@ GRAPH = (function(graph) {
   var margin = {top: 20, right: 40, bottom: 60, left: 60};
   var width = window.innerWidth - margin.left - margin.right;
   var height = 240 - margin.top - margin.bottom;
-  var color = d3.scale.category10();
 
   // Create the graph and offset by margins
   var svg = d3.select('#reviews')
@@ -53,7 +52,7 @@ GRAPH = (function(graph) {
           .style('text-anchor', 'start')
           .text('Rating');
 
-  graph.sortByReviews = function(data) {
+  graph.reviews = function(data) {
 
       var xRatingScaleDomain = data.filter(function(d, i, arr) {
         var blockSize = Math.floor(arr.length / 8);
@@ -84,7 +83,7 @@ GRAPH = (function(graph) {
         .attr('x', function(d, i) { return x(d.title); })
         .attr('y', function(d) { return y(d.rating); })
         .attr('height', function(d) { return height - y(d.rating); })
-        .attr('fill', function(d) { return color(d.genre); })
+        .attr('fill', function(d) { return graph.color(d.genre); })
         .attr('width', x.rangeBand())
 
       bargraph.exit().remove();
@@ -95,7 +94,7 @@ GRAPH = (function(graph) {
             .attr('height', 150)
 
       var nodes = legend.selectAll('g')
-            .data(color.domain()).enter()
+            .data(graph.color.domain()).enter()
               .append('g')
                 .attr('class', 'legend')
                 .attr('transform', function(d, i) { return 'translate(0, '+i*16+')';})
@@ -103,7 +102,7 @@ GRAPH = (function(graph) {
       nodes.append('rect')
             .attr('width', 10)
             .attr('height', 10)
-            .attr('fill', function(d){ return color(d) })
+            .attr('fill', function(d){ return graph.color(d) })
 
       nodes.append('text')
             .attr('x', 13)

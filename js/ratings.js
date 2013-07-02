@@ -3,7 +3,6 @@ GRAPH = (function(graph) {
   var margin = {top: 20, right: 40, bottom: 60, left: 60};
   var width = window.innerWidth - margin.left - margin.right;
   var height = 240 - margin.top - margin.bottom;
-  var color = d3.scale.category10();
 
   // Create the graph and offset by margins
   var svg = d3.select('#ratings')
@@ -53,7 +52,7 @@ GRAPH = (function(graph) {
           .style('text-anchor', 'start')
           .text('Reviews');
 
-  graph.sortByRatings = function(data) {
+  graph.ratings = function(data) {
 
       var xRatingScaleDomain = data.filter(function(d, i, arr) {
         var blockSize = Math.floor(arr.length / 8);
@@ -84,7 +83,7 @@ GRAPH = (function(graph) {
         .attr('x', function(d, i) { return x(d.title); })
         .attr('y', function(d) { return y(d.reviewCount); })
         .attr('height', function(d) { return height - y(d.reviewCount); })
-        .attr('fill', function(d) { return color(d.genre); })
+        .attr('fill', function(d) { return graph.color(d.genre); })
         .attr('width', x.rangeBand())
 
       bargraph.exit().remove();
