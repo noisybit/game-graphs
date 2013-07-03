@@ -24,8 +24,7 @@ var GRAPH = (function(graph) {
       $tooltip.css('top', yOffset+"px").css('left', xOffset+"px")
   }
 
-  d3.json('/data/rated.json', function(err, data) {
-
+  graph.init = function(data) {
     // Convert strings to numbers
     data.forEach(function(d) {
       d.rating = +d.rating;
@@ -109,7 +108,7 @@ var GRAPH = (function(graph) {
       $('h3.rating').html(writeRange(filter.ratings[1], filter.ratings[0], 'Ratings'));
 
       render();
-    })
+    });
 
     function render() {
       graph.reviews.render(sorted.reviews.filter(filterData));

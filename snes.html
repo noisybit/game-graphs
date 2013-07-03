@@ -1,0 +1,65 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <link rel='stylesheet' href='/css/bootstrap.css'>
+    <link rel='stylesheet' href='http://code.jquery.com/ui/1.10.3/themes/ui-lightness/jquery-ui.min.css'>
+    <link rel='stylesheet' href='/css/style.css'>
+  </head>
+  <body>
+    <section id='header'>
+      <h1>Super Nintendo Game Ratings</h1>
+      <ul class='contact-links'>
+        <li><a href='https://www.github.com/brainss/'>Github</a></li>
+        <li><a href='https://twitter.com/brainss_'>Twitter</a></li>
+        <li><a href='http://blog.brainss.me'>Blog</a></li>
+      </ul>
+    </section>
+    <section id='main'>
+      <div class='graphs'>
+        <svg id='reviews'></svg>
+        <svg id='ratings'></svg>
+      </div>
+      <div class='controls'>
+        <div class='control-reviews'>
+          <h3 class='review'>Reviews</h3>
+          <div id='reviewSlider' class='slider'></div>
+        </div>
+        <div class='control-ratings'>
+          <h3 class='rating'>Ratings</h3>
+          <div id='ratingSlider' class='slider'></div>
+        </div>
+        <div class='control-genres'>
+          <h3 class='genre'>Genres</h3>
+          <svg class='legend'></svg>
+        </div>
+      </div>
+    </section>
+    <section id='footer'>
+        <p>
+          Source: <a href='http://www.gamefaqs.com/snes'>GameFAQs</a>
+        </p>
+    </section>
+    <div id='tooltip'>
+      <h3 id='title'></h2>
+      <div class='game-info'>
+      <img class='game-boxart'>
+        <ul>
+          <li><span class='game-rating'></span> / 10</li>
+          <li><span class='game-reviews'></span> reviews</li>
+        </ul>
+      </div>
+    </div>
+    <script type='text/javascript' src='http://code.jquery.com/jquery-1.9.1.js'></script>
+    <script type='text/javascript' src='http://code.jquery.com/ui/1.10.3/jquery-ui.js'></script>
+    <script type='text/javascript' src='/js/d3.js'></script>
+    <script type='text/javascript' src='/js/main.js'></script>
+    <script type='text/javascript' src='/js/bargraph.js'></script>
+    <script type='text/javascript'>
+      $(document).ready(function() {
+        d3.json('/data/snes.json', function(err, data) {
+          GRAPH.init(data);
+        });
+      })
+    </script>
+  </body>
+</html>
