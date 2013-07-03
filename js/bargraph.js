@@ -80,8 +80,7 @@ GRAPH = (function(graph) {
             .on('mousemove', graph.moveTooltip)
             .on('mouseout', graph.hideTooltip)
             .on('click', function(d) {
-              console.log(d);
-              window.open('http://blog.brainss.me', '_blank');
+              window.open(d.href, '_blank');
             })
 
         bars
