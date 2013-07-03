@@ -1,9 +1,9 @@
 <!DOCTYPE>
 <html>
   <head>
-    <link rel='stylesheet' href='/css/bootstrap.css'>
+    <link rel='stylesheet' href='css/bootstrap.css'>
     <link rel='stylesheet' href='http://code.jquery.com/ui/1.10.3/themes/ui-lightness/jquery-ui.min.css'>
-    <link rel='stylesheet' href='/css/style.css'>
+    <link rel='stylesheet' href='css/style.css'>
   </head>
   <body>
     <section id='header'>
@@ -51,12 +51,12 @@
     </div>
     <script type='text/javascript' src='http://code.jquery.com/jquery-1.9.1.js'></script>
     <script type='text/javascript' src='http://code.jquery.com/ui/1.10.3/jquery-ui.js'></script>
-    <script type='text/javascript' src='/js/d3.js'></script>
-    <script type='text/javascript' src='/js/main.js'></script>
-    <script type='text/javascript' src='/js/bargraph.js'></script>
+    <script type='text/javascript' src='js/d3.js'></script>
+    <script type='text/javascript' src='js/main.js'></script>
+    <script type='text/javascript' src='js/bargraph.js'></script>
     <script type='text/javascript'>
       $(document).ready(function() {
-        d3.json('/data/snes.json', function(err, data) {
+        d3.json('data/snes.json', function(err, data) {
           GRAPH.init(data);
         });
       })
