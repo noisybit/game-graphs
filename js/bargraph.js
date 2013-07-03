@@ -79,6 +79,10 @@ GRAPH = (function(graph) {
             .on('mouseover', graph.showTooltip)
             .on('mousemove', graph.moveTooltip)
             .on('mouseout', graph.hideTooltip)
+            .on('click', function(d) {
+              console.log(d);
+              window.open('http://blog.brainss.me', '_blank');
+            })
 
         bars
           .attr('x', function(d, i) { return x(d.title); })

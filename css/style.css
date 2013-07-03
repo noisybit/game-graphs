@@ -1,10 +1,13 @@
 body {
   background-color: gainsboro;
+  background-image: url(/img/cross_scratches.png);
+  background-repeat: repeat repeat;
   overflow-x: hidden;
 }
 
 h1 {
   color: blueviolet;
+  text-align: center;
 }
 
 path {
@@ -13,52 +16,86 @@ path {
   fill: none;
 }
 
-#gameInfo {
-  background-color: silver;
+.contact-links {
   position: absolute;
-  display: none;
-  padding: 0.5em;
-  border-radius: 3px;
-  max-width: 30em;
-  min-width: 20em;
+  top: .4em;
+  right: .4em;
 }
 
-#gameInfo img {
+.contact-links li {
+  list-style-type: none;
   float: left;
-  padding-right: 1em;
-  display: block;
+  margin-left: .25em;
+  margin-right: .25em;
 }
 
-#description {
-  font-size: 1.5em;
-  background-color: blueviolet;
-  display: inline;
+.bar {
+  cursor: pointer;
 }
 
-#gameInfo .score {
-  display: block;
-}
-
-
-.yBarAxis {
-  position: fixed;
-  left: 0;
-}
-
-.yLineAxis {
-  position: fixed;
-  right: 0;
-}
-
-.explaination {
+.controls {
   padding-left: 3em;
   padding-right: 3em;
 }
 
-li {
-  list-style-type: none;
+.controls .slider {
+  margin-left: 2em;
 }
 
 .slider {
   margin: 10px;
+}
+
+.control-genres .legend {
+  margin-left: 2em;
+}
+
+.genre-color {
+  cursor: pointer;
+}
+
+.strike { 
+  text-decoration: line-through;
+}
+
+#tooltip {
+  display: none;
+  position: absolute;
+  border-radius: 3px;
+  padding: 0.5em;
+  max-width: 25em;
+  min-width: 20em;
+  z-index: 100;
+  background-color: gainsboro;
+  -webkit-box-shadow: 2px 2px 9px 0px #000;
+     -moz-box-shadow: 2px 2px 9px 0px #000;
+          box-shadow: 2px 2px 9px 0px #000;
+}
+
+#tooltip h3 {
+}
+
+.game-info {
+  float: left;
+  padding: 0px;
+  margin: 0px;
+}
+
+.game-boxart {
+  margin: 0px;
+}
+
+.game-info ul {
+  font-size: 1.5em;
+  display: inline-block;
+  list-style-type: none;
+}
+
+.game-info li {
+  text-align: center;
+}
+
+#footer {
+  text-align: right;
+  padding-right: 1em;
 }
