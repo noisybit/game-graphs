@@ -6,7 +6,7 @@ var GRAPH = (function(graph) {
     $tooltip.find('#title').html(d.title);
     $tooltip.find('.game-boxart').attr('src', d.boxart);
     $tooltip.find('.game-rating').html(d.rating);
-    $tooltip.find('.game-reviews').html(d.reviewCount);
+    $tooltip.find('.game-reviews').html(d.reviews);
     $tooltip.show();
   }
 
@@ -24,11 +24,12 @@ var GRAPH = (function(graph) {
       $tooltip.css('top', yOffset+"px").css('left', xOffset+"px")
   }
 
-  graph.init = function(data) {
+  graph.init = function(json) {
+    var data = json.records;
     // Convert strings to numbers
     data.forEach(function(d) {
       d.rating = +d.rating;
-      d.reviewCount = +d.reviewCount;
+      d.reviews = +d.reviews;
     })
 
     // Sort
@@ -38,7 +39,7 @@ var GRAPH = (function(graph) {
     };
 
     sorted.reviews.sort(function(a, b) {
-      var reviews = b.reviewCount - a.reviewCount;
+      var reviews = b.reviews - a.reviews;
       return (reviews === 0) ? b.rating - a.rating : reviews;
     })
 
@@ -49,8 +50,8 @@ var GRAPH = (function(graph) {
     //
     // Get all unique values
     sorted.reviews.forEach(function(d) {
-      if(slider.reviews.indexOf(d.reviewCount) < 0)
-        slider.reviews.push(d.reviewCount);
+      if(slider.reviews.indexOf(d.reviews) < 0)
+        slider.reviews.push(d.reviews);
     })
 
     // Get all unique values
@@ -72,7 +73,7 @@ var GRAPH = (function(graph) {
         svg: '#reviews',
         xLabel: 'Reviews',
         yLabel: 'Ratings',
-        xSelector: 'reviewCount',
+        xSelector: 'reviews',
         yMax: 'rating',
         yInput: 'rating'
       });
@@ -82,8 +83,8 @@ var GRAPH = (function(graph) {
         xLabel: 'Ratings',
         yLabel: 'Reviews',
         xSelector: 'rating',
-        yMax: 'reviewCount',
-        yInput: 'reviewCount'
+        yMax: 'reviews',
+        yInput: 'reviews'
       });
 
       $('#reviewSlider')
@@ -116,8 +117,8 @@ var GRAPH = (function(graph) {
     }
 
     function filterData(d) {
-      return d.reviewCount >= filter.reviews[0]
-          && d.reviewCount <= filter.reviews[1]
+      return d.reviews >= filter.reviews[0]
+          && d.reviews <= filter.reviews[1]
           && d.rating >= filter.ratings[0]
           && d.rating <= filter.ratings[1]
           && filter.genre.indexOf(d.genre) < 0;
@@ -167,7 +168,7 @@ var GRAPH = (function(graph) {
         : d3.select(this).classed('strike', true)
       render();
     }
-  })
+  };
 
   return graph;
 
