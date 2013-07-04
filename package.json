@@ -1,0 +1,25 @@
+{
+  "name": "vg-ratings",
+  "version": "0.0.0",
+  "description": "A collection of various video game ratings",
+  "main": "spider.js",
+  "dependencies": {
+    "spider": "~0.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/brainss/vg-ratings.git"
+  },
+  "keywords": [
+    "gamefaqs",
+    "graphs"
+  ],
+  "author": "brainss",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "gitHead": "eaf24bcac46e2d06db745a041ae9424c599787ba"
+}
