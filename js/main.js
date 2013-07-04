@@ -31,27 +31,10 @@ graph = (function(graph) {
     // Setup the controls
     var controls = graph.controls = {};
 
-    // Setup the slider state
+    // Setup the slider unique values
     var slider = controls.slider = {};
     slider.reviews = [];
     slider.ratings = [];
-
-    // Setup the genre state
-    var genre = graph.controls.genre = {};
-
-    // onSlide
-    controls.onSlide = function(e, ui) {
-      var $h3 = $(this).prev();
-      var label = $h3.find('.label').text().toLowerCase();
-      var unique = slider[label];
-      var lower = unique[ui.values[1]];
-      var upper = unique[ui.values[0]];
-      var state = filter[label] = [lower, upper]
-      $h3.find('.lower').text(lower);
-      $h3.find('.upper').text(upper);
-      graph.render();
-    };
-
 
     // Fill slider.reviews with unique values
     sorted.reviews.forEach(function(d) {
@@ -65,6 +48,21 @@ graph = (function(graph) {
         slider.ratings.push(d.rating);
     })
 
+    // Setup the genre state
+    var genre = graph.controls.genre = {};
+
+    // onSlide
+    controls.onSlide = function(e, ui) {
+      var $h3 = $(this).prev();
+      var label = $h3.find('.slider-label').text().toLowerCase();
+      var unique = slider[label];   
+      var lower = unique[ui.values[1]];
+      var upper = unique[ui.values[0]];
+      filter[label] = [lower, upper]
+      $h3.find('.lower').text(lower);
+      $h3.find('.upper').text(upper);
+      graph.render();
+    };
 
     // Slider initial lower bounds
     var top25 = Math.floor(.25 *  slider.reviews.length);
