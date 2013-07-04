@@ -108,4 +108,4 @@ graph = (function(graph) {
 
   }
   return graph;
-}(graph || {}))
+}(window.graph || {}))

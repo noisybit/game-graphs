@@ -1,71 +1,94 @@
 graph = (function(graph) {
   graph.color = d3.scale.category10();
 
-  var $tooltip = $('#tooltip');
-  graph.showTooltip = function (d) {
-    $tooltip.find('#title').html(d.title);
-    $tooltip.find('.game-boxart').attr('src', d.boxart);
-    $tooltip.find('.game-rating').html(d.rating);
-    $tooltip.find('.game-reviews').html(d.reviews);
-    $tooltip.show();
-  }
-
-  graph.hideTooltip = function() {
-    $tooltip.hide()
-  }
-
-  graph.moveTooltip = function() {
-    var yOffset = d3.event.pageY-10;
-    var xOffset = d3.event.pageX+10;
-    var width = $tooltip[0].scrollWidth;
-    if(width + xOffset > window.innerWidth) 
-      $tooltip.css('top', yOffset+"px").css('left', (xOffset - 20 - width)+"px")
-    else
-      $tooltip.css('top', yOffset+"px").css('left', xOffset+"px")
-  }
-
+  // initialize with the dataset
   graph.init = function(json) {
     var data = json.records;
+
     // Convert strings to numbers
     data.forEach(function(d) {
       d.rating = +d.rating;
       d.reviews = +d.reviews;
     })
 
-    // Sort
-    var sorted= graph.sorted = {
-      reviews: data.slice(0),
-      ratings: data.slice(0).sort(function(a, b){ return b.rating - a.rating})
-    };
+    // Clone data for sorting
+    var sorted = graph.sorted = {};
+    sorted.reviews = data.slice(0);
+    sorted.ratings = data.slice(0);
 
+    // Sort by reviews, then by rating
     sorted.reviews.sort(function(a, b) {
       var reviews = b.reviews - a.reviews;
       return (reviews === 0) ? b.rating - a.rating : reviews;
     })
 
-    var slider = {
-      reviews: [],
-      ratings: []
-    }
-    //
-    // Get all unique values
+    // Sort by rating, then by reviews
+    sorted.ratings.sort(function(a, b) {
+      var rating = b.rating - a.rating;
+      return (rating === 0) ? b.reviews - a.reviews : rating;
+    })
+
+    // Setup the controls
+    var controls = graph.controls = {};
+
+    // Setup the slider state
+    var slider = controls.slider = {};
+    slider.reviews = [];
+    slider.ratings = [];
+
+    // Setup the genre state
+    var genre = graph.controls.genre = {};
+
+    // onSlide
+    controls.onSlide = function(e, ui) {
+      var $h3 = $(this).prev();
+      var label = $h3.find('.label').text().toLowerCase();
+      var unique = slider[label];
+      var lower = unique[ui.values[1]];
+      var upper = unique[ui.values[0]];
+      var state = filter[label] = [lower, upper]
+      $h3.find('.lower').text(lower);
+      $h3.find('.upper').text(upper);
+      graph.render();
+    };
+
+
+    // Fill slider.reviews with unique values
     sorted.reviews.forEach(function(d) {
       if(slider.reviews.indexOf(d.reviews) < 0)
         slider.reviews.push(d.reviews);
     })
 
-    // Get all unique values
+    // Fill slider.ratings with unique values
     sorted.ratings.forEach(function(d) {
       if(slider.ratings.indexOf(d.rating) < 0)
         slider.ratings.push(d.rating);
     })
 
-    var filter = graph.filter = {
-      reviews: [slider.reviews[100], slider.reviews[0]],
-      ratings: [slider.ratings[40], slider.ratings[0]],
-      genre: []
-    };
 
+    // Slider initial lower bounds
+    var top25 = Math.floor(.25 *  slider.reviews.length);
+    var top15 = Math.floor(.15 *  slider.reviews.length);
+
+    // Setup the data filter
+    var filter = graph.filter = {};
+    filter.genre = [];
+    filter.reviews = [slider.reviews[top25], slider.reviews[0]];
+    filter.ratings = [slider.ratings[top15], slider.ratings[0]];
+    filter.execute = function (d) {
+      return d.reviews >= filter.reviews[0]
+          && d.reviews <= filter.reviews[1]
+          && d.rating >= filter.ratings[0]
+          && d.rating <= filter.ratings[1]
+          && filter.genre.indexOf(d.genre) < 0;
+    }
+
+
+    // Render both graphs
+    graph.render = function() {
+      graph.reviews.render(sorted.reviews.filter(filter.execute));
+      graph.ratings.render(sorted.ratings.filter(filter.execute));
+    }
 
     $(document).ready(function() {
 
@@ -87,46 +110,23 @@ graph = (function(graph) {
         yInput: 'reviews'
       });
 
-      $('#reviewSlider')
-        .slider({range: true, values: [0, 100], min: 0, max: slider.reviews.length-1})
-        .on('slide', function(e, ui) {
-          filter.reviews[0] = slider.reviews[ui.values[1]]; // Min
-          filter.reviews[1] = slider.reviews[ui.values[0]]; // Max
-          $('h3.review').html(writeRange(filter.reviews[1], filter.reviews[0], 'Reviews'));
-          render();
-        });
+      $('.control-reviews .slider').slider({
+        range: true,
+        values: [0, 100],
+        min: 0,
+        max: slider.reviews.length-1
+      }).on('slide', controls.onSlide);
 
-      $('#ratingSlider')
-        .slider({range: true, values: [0, 40], min: 0, max: slider.ratings.length-1})
-        .on('slide', function(e, ui) {
-          filter.ratings[0] = slider.ratings[ui.values[1]]; // Min
-          filter.ratings[1] = slider.ratings[ui.values[0]]; // Max
-          $('h3.rating').html(writeRange(filter.ratings[1], filter.ratings[0], 'Ratings'));
-          render();
-        })
+      $('.control-ratings .slider').slider({
+        range: true,
+        values: [0, 40], 
+        min: 0, 
+        max: slider.ratings.length-1
+        }).on('slide', controls.onSlide);
 
-      $('h3.review').html(writeRange(filter.reviews[1], filter.reviews[0], 'Reviews'));
-      $('h3.rating').html(writeRange(filter.ratings[1], filter.ratings[0], 'Ratings'));
-
-      render();
+      graph.render();
     });
 
-    function render() {
-      graph.reviews.render(sorted.reviews.filter(filterData));
-      graph.ratings.render(sorted.ratings.filter(filterData));
-    }
-
-    function filterData(d) {
-      return d.reviews >= filter.reviews[0]
-          && d.reviews <= filter.reviews[1]
-          && d.rating >= filter.ratings[0]
-          && d.rating <= filter.ratings[1]
-          && filter.genre.indexOf(d.genre) < 0;
-    }
-
-    function writeRange(max, min, label) {
-      return max + ' &#8805; '+ label + ' &#8805; ' + min;
-    }
 
     var lWidth = 500;
     var lHeight = 100;
@@ -170,6 +170,29 @@ graph = (function(graph) {
     }
   };
 
+  var $tooltip = $('#tooltip');
+  graph.showTooltip = function (d) {
+    $tooltip.find('.game-title').html(d.title);
+    $tooltip.find('.game-boxart').attr('src', d.boxart);
+    $tooltip.find('.game-rating').html(d.rating);
+    $tooltip.find('.game-reviews').html(d.reviews);
+    $tooltip.show();
+  }
+
+  graph.hideTooltip = function() {
+    $tooltip.hide()
+  }
+
+  graph.moveTooltip = function() {
+    var yOffset = d3.event.pageY-10;
+    var xOffset = d3.event.pageX+10;
+    var width = $tooltip[0].scrollWidth;
+    if(width + xOffset > window.innerWidth) 
+      $tooltip.css('top', yOffset+"px").css('left', (xOffset - 20 - width)+"px")
+    else
+      $tooltip.css('top', yOffset+"px").css('left', xOffset+"px")
+  }
+
   return graph;
 
-}(graph || {}))
+}(window.graph || {}))
