@@ -1,5 +1,6 @@
-# System Scores
-A collection of video game reviews from various systems show through graphs.
+# Video Game Ratings
+A collection of video game reviews from various systems shown through graphs.
+[Project page](http://blog.brainss.me/vg-ratings)
 
 ## Data Collection
 The data was scraped using the `spider.js` in this branch.
