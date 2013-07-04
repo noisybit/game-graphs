@@ -1,4 +1,4 @@
-GRAPH = (function(graph) {
+graph = (function(graph) {
 
   var margin = {top: 20, right: 40, bottom: 60, left: 60};
   var width = window.innerWidth - margin.left - margin.right;
@@ -108,4 +108,4 @@ GRAPH = (function(graph) {
 
   }
   return graph;
-}(GRAPH || {}))
+}(graph || {}))

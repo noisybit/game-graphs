@@ -1,4 +1,4 @@
-var GRAPH = (function(graph) {
+graph = (function(graph) {
   graph.color = d3.scale.category10();
 
   var $tooltip = $('#tooltip');
@@ -172,4 +172,4 @@ var GRAPH = (function(graph) {
 
   return graph;
 
-}(GRAPH || {}))
+}(graph || {}))
