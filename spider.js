@@ -43,7 +43,7 @@ process.on('exit', function() {
     records: records
   };
   var str = JSON.stringify(data);
-  var filename = __dirname+'/data/'+system+'-'+data.timestamp+'.json';
+  var filename = __dirname+'/data/'+system+'.json';
 
   if(records.length) {
     fs.writeFileSync(filename, str, 'utf8');
