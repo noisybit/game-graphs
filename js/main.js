@@ -126,37 +126,17 @@ graph = (function(graph) {
     });
 
 
-    var lWidth = 500;
-    var lHeight = 100;
-    var legendColors = graph.color.domain();
-
-    // Draw the legend
-    var legend = d3.select('.legend')
-          .attr('width', lWidth)
-          .attr('height', lHeight);
-
-    var nodes = legend.selectAll('g')
-          .data(legendColors)
-          .enter()
-            .append('g')
-              .attr('class', 'genre-color')
-              .attr('transform', function(d, i) {
-                var x = Math.floor(i % 2) * (lWidth / 2);
-                var y = Math.floor(i / 2) * (lHeight / legendColors.length * 2) ;
-                return 'translate('+ x +', '+ y +')';
-               })
-               .on('click', toggleGenre)
-
-    nodes.append('rect')
-          .attr('width', 10)
-          .attr('height', 10)
-          .attr('fill', function(d){ return graph.color(d) })
-
-    nodes.append('text')
-          .attr('x', 13)
-          .attr('dy', '.71em')
-          .style('text-anchor', 'start')
-          .text(function(d){ return d; });
+    // Setup the genres
+    d3.select('.control-genres ul')
+        .selectAll('li')
+        .data(graph.color.domain())
+        .enter()
+          .append('li')
+          .attr('class', 'genre')
+          .text(function(d){ return d;})
+          .on('click', toggleGenre)
+          .append('span')
+            .attr('class', 'genre-color')
 
     function toggleGenre(genre) {
       var index = filter.genre.indexOf(genre);
@@ -164,7 +144,7 @@ graph = (function(graph) {
       d3.select(this).classed('strike')
         ? d3.select(this).classed('strike', false)
         : d3.select(this).classed('strike', true)
-      render();
+      graph.render();
     }
   };
 
