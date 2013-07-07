@@ -55,7 +55,9 @@ process.on('SIGINT', function(){ process.exit() });
 
 function log(game) {
   var msg = game.rating + '/10';
-  msg += ' \"'+ (game.title.length > 50 ? game.title.slice(0, 47) + '...' : game.title) + '\"';
+  msg += ' \"'+ (game.title.length > 50 
+                ? game.title.slice(0, 47) + '...'
+                : game.title) + '\"';
   msg += ' ['+game.genre+']['+game.subgenre+']';
   console.log(msg);
 }
