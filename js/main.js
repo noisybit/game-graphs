@@ -1,5 +1,12 @@
 graph = (function(graph) {
   graph.color = d3.scale.category10();
+  graph.color.domain([
+    "Action",           "Role-Playing",
+    "Action Adventure", "Strategy",
+    "Driving",           "Sports",
+    "Simulation",         "Hardware", 
+    "Miscellaneous",       "Adventure"
+  ]);
 
   // initialize with the dataset
   graph.init = function(json) {
@@ -151,29 +158,26 @@ graph = (function(graph) {
     // Setup the genres
     var li = d3.select('.control-genres ul')
         .selectAll('li')
-        .data(g.entries())
+        .data(graph.color.domain())
         .enter()
           .append('li')
           .attr('class', 'genre')
 
     li.insert('div')
             .attr('class', 'genre-color')
-            .attr('style', function(d) { return 'background-color: '+graph.color(d.key)+';'; })
+            .attr('style', function(d) { 
+              return 'background-color: '+graph.color(d)+';'; 
+            })
 
     li.append('text')
-      .text(function(d){ return d.key;})
+      .text(function(d){ return d;})
       .on('click', toggleGenre)
 
-    li.append('ul')
-      .attr('class', 'genre-subgenre')
-
     function toggleGenre(d) {
-      var type = (d.key) ? 'genre' : 'subgenre';
-      var name = (type === 'genre') ? d.key : d.toString()
-      var index = filter[type].indexOf(name);
+      var index = filter.genre.indexOf(d);
       (index < 0)
-        ? filter[type].push(name)
-        : filter[type].splice(index, 1);
+        ? filter.genre.push(name)
+        : filter.genre.splice(index, 1);
       $(this).toggleClass('strike');
       graph.render();
     }
