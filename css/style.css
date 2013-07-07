@@ -46,12 +46,26 @@ path {
   margin: 10px;
 }
 
-.control-genres .legend {
-  margin-left: 2em;
+.control-genres ul {
+  list-style-type: none;
+  display: block;
+}
+
+.genre {
+  cursor: pointer;
+  float: left;
+}
+
+.genre text {
+  font-size: 1.3em;
 }
 
 .genre-color {
-  cursor: pointer;
+  width: 10px;
+  height: 10px;
+  border: 1px solid black;
+  display: inline-block;
+  margin-right: 1em;
 }
 
 .strike { 

@@ -4,11 +4,23 @@ graph = (function(graph) {
   // initialize with the dataset
   graph.init = function(json) {
     var data = json.records;
+    var g = d3.map();
 
     // Convert strings to numbers
     data.forEach(function(d) {
       d.rating = +d.rating;
       d.reviews = +d.reviews;
+
+      var key = d.genre;
+      var sub = d.subgenre;
+      if(!g.has(key))
+        g.set(key, []);
+
+      var arr = g.get(key);
+      if(arr.indexOf(sub) < 0) {
+        arr.push(sub);
+        g.set(key, arr);
+      }
     })
 
     // Clone data for sorting
@@ -127,16 +139,34 @@ graph = (function(graph) {
 
 
     // Setup the genres
-    d3.select('.control-genres ul')
+    var li = d3.select('.control-genres ul')
         .selectAll('li')
-        .data(graph.color.domain())
+        .data(g.entries())
         .enter()
           .append('li')
           .attr('class', 'genre')
-          .text(function(d){ return d;})
           .on('click', toggleGenre)
-          .append('span')
+
+    li.insert('div')
             .attr('class', 'genre-color')
+            .attr('style', function(d) { return 'background-color: '+graph.color(d.key)+';'; })
+
+    li.append('text')
+      .text(function(d){ return d.key;})
+
+    li.append('ul')
+      .attr('class', 'genre-subgenre')
+
+    // subgenres
+    li.select('ul').selectAll('li')
+      .data(function(d){ return d.value;})
+      .enter()
+        .append('li')
+        .attr('class', 'subgenre')
+        .on('click', toggleGenre)
+        .append('text')
+          .text(function(d) { return d})
+      
 
     function toggleGenre(genre) {
       var index = filter.genre.indexOf(genre);
