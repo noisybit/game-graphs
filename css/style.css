@@ -48,16 +48,14 @@ path {
 
 .control-genres ul {
   list-style-type: none;
-  display: block;
   width: 30em;
 }
 
 .genre {
   cursor: pointer;
-  float: left;
-  display: inline;
   line-height: 1.5em;
   width: 50%;
+  display: inline-block;
 }
 
 .genre text {
@@ -91,9 +89,6 @@ path {
           box-shadow: 2px 2px 9px 0px #000;
 }
 
-#tooltip h3 {
-}
-
 .game-info {
   float: left;
   padding: 0px;
@@ -114,7 +109,8 @@ path {
   text-align: center;
 }
 
-#footer {
+footer {
+  display: block;
   text-align: right;
   padding-right: 1em;
 }
