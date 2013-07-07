@@ -136,7 +136,15 @@ graph = (function(graph) {
         max: slider.ratings.length-1
         }).on('slide', controls.onSlide);
 
+      // Set the initial bounds
+      $('.control-reviews').find('.lower').text(filter.reviews[0]);
+      $('.control-reviews').find('.upper').text(filter.reviews[1]);
+      $('.control-ratings').find('.lower').text(filter.ratings[0]);
+      $('.control-ratings').find('.upper').text(filter.ratings[1]);
+
       graph.render();
+
+
     });
 
 
@@ -158,17 +166,6 @@ graph = (function(graph) {
 
     li.append('ul')
       .attr('class', 'genre-subgenre')
-
-    // subgenres
-    li.select('ul').selectAll('li')
-      .data(function(d){ return d.value;})
-      .enter()
-        .append('li')
-        .attr('class', 'subgenre')
-        .on('click', toggleGenre)
-        .append('text')
-          .text(function(d) { return d})
-      
 
     function toggleGenre(d) {
       var type = (d.key) ? 'genre' : 'subgenre';
