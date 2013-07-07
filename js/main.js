@@ -83,6 +83,7 @@ graph = (function(graph) {
     // Setup the data filter
     var filter = graph.filter = {};
     filter.genre = [];
+    filter.subgenre = [];
     filter.reviews = [slider.reviews[top25], slider.reviews[0]];
     filter.ratings = [slider.ratings[top15], slider.ratings[0]];
     filter.execute = function (d) {
@@ -90,7 +91,8 @@ graph = (function(graph) {
           && d.reviews <= filter.reviews[1]
           && d.rating >= filter.ratings[0]
           && d.rating <= filter.ratings[1]
-          && filter.genre.indexOf(d.genre) < 0;
+          && filter.genre.indexOf(d.genre) < 0
+          && filter.subgenre.indexOf(d.subgenre) < 0;
     }
 
 
@@ -145,7 +147,6 @@ graph = (function(graph) {
         .enter()
           .append('li')
           .attr('class', 'genre')
-          .on('click', toggleGenre)
 
     li.insert('div')
             .attr('class', 'genre-color')
@@ -153,6 +154,7 @@ graph = (function(graph) {
 
     li.append('text')
       .text(function(d){ return d.key;})
+      .on('click', toggleGenre)
 
     li.append('ul')
       .attr('class', 'genre-subgenre')
@@ -168,12 +170,14 @@ graph = (function(graph) {
           .text(function(d) { return d})
       
 
-    function toggleGenre(genre) {
-      var index = filter.genre.indexOf(genre);
-      (index < 0) ? filter.genre.push(genre) : filter.genre.splice(index, 1);
-      d3.select(this).classed('strike')
-        ? d3.select(this).classed('strike', false)
-        : d3.select(this).classed('strike', true)
+    function toggleGenre(d) {
+      var type = (d.key) ? 'genre' : 'subgenre';
+      var name = (type === 'genre') ? d.key : d.toString()
+      var index = filter[type].indexOf(name);
+      (index < 0)
+        ? filter[type].push(name)
+        : filter[type].splice(index, 1);
+      $(this).toggleClass('strike');
       graph.render();
     }
   };
