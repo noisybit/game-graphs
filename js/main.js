@@ -188,15 +188,19 @@ graph = (function(graph) {
   };
 
   var $tooltip = $('#tooltip');
+  var timeout;
   graph.showTooltip = function (d) {
     $tooltip.find('.game-title').html(d.title);
-    $tooltip.find('.game-boxart').attr('src', d.boxart);
+    timeout = setTimeout(function() {
+      $tooltip.find('.game-boxart').attr('src', d.boxart);
+    }, 25);
     $tooltip.find('.game-rating').html(d.rating);
     $tooltip.find('.game-reviews').html(d.reviews);
     $tooltip.show();
   }
 
   graph.hideTooltip = function() {
+    clearTimeout(timeout);
     $tooltip.hide()
   }
 
