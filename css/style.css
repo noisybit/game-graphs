@@ -1,6 +1,6 @@
 body {
   background-color: gainsboro;
-  background-image: url(img/cross_scratches.png);
+  background-image: url(../img/cross_scratches.png);
   background-repeat: repeat repeat;
   overflow-x: hidden;
 }
