@@ -90,7 +90,6 @@ graph = (function(graph) {
     // Setup the data filter
     var filter = graph.filter = {};
     filter.genre = [];
-    filter.subgenre = [];
     filter.reviews = [slider.reviews[top25], slider.reviews[0]];
     filter.ratings = [slider.ratings[top15], slider.ratings[0]];
     filter.execute = function (d) {
@@ -98,8 +97,7 @@ graph = (function(graph) {
           && d.reviews <= filter.reviews[1]
           && d.rating >= filter.ratings[0]
           && d.rating <= filter.ratings[1]
-          && filter.genre.indexOf(d.genre) < 0
-          && filter.subgenre.indexOf(d.subgenre) < 0;
+          && filter.genre.indexOf(d.genre) < 0;
     }
 
 
@@ -172,11 +170,17 @@ graph = (function(graph) {
     li.append('text')
       .text(function(d){ return d;})
       .on('click', toggleGenre)
+      .on('mouseover', function() {
+        $(this).attr('style', 'text-decoration: line-through;')
+      })
+      .on('mouseout', function() {
+        $(this).attr('style', '');
+      })
 
     function toggleGenre(d) {
       var index = filter.genre.indexOf(d);
       (index < 0)
-        ? filter.genre.push(name)
+        ? filter.genre.push(d)
         : filter.genre.splice(index, 1);
       $(this).toggleClass('strike');
       graph.render();
