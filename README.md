@@ -1,4 +1,4 @@
-# Video Game Ratings
+# Game Graphs
 A collection of video game reviews from various systems shown through [graphs](http://blog.brainss.me/vg-ratings).
 
 ![Super Nintendo Ratings](img/vg-ratings.png)
