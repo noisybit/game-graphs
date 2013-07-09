@@ -90,6 +90,7 @@ graph = (function(graph) {
     // Setup the data filter
     var filter = graph.filter = {};
     filter.genre = [];
+    filter.subgenre = [];
     filter.reviews = [slider.reviews[top25], slider.reviews[0]];
     filter.ratings = [slider.ratings[top15], slider.ratings[0]];
     filter.execute = function (d) {
@@ -97,7 +98,8 @@ graph = (function(graph) {
           && d.reviews <= filter.reviews[1]
           && d.rating >= filter.ratings[0]
           && d.rating <= filter.ratings[1]
-          && filter.genre.indexOf(d.genre) < 0;
+          && filter.genre.indexOf(d.genre) < 0
+          && filter.subgenre.indexOf(d.subgenre) < 0;
     }
 
 
@@ -177,11 +179,56 @@ graph = (function(graph) {
         $(this).attr('style', '');
       })
 
+    // Setup the subgenre controls
+    var subul = d3.select('.control-subgenres')
+          .selectAll('ul')
+          .data(g.entries())
+            .enter()
+              .append('ul')
+
+    var sub = subul.selectAll('li')
+          .data(function(d) {
+            return d.value.map(function(s) {
+              return {name: s, parent: d.key};
+            })
+          })
+          .enter()
+          .append('li')
+          .attr('class', 'subgenre')
+
+
+    sub.insert('div')
+        .attr('class', 'genre-color')
+        .attr('style', function(d){ 
+          return 'background-color: '+graph.color(d.parent)+';';
+        })
+
+    sub.append('text')
+      .text(function(d){
+        return d.name;
+      })
+      .on('click', toggleSubgenre)
+      .on('mouseover', function() {
+        $(this).attr('style', 'text-decoration: line-through;')
+      })
+      .on('mouseout', function() {
+        $(this).attr('style', '');
+      })
+
     function toggleGenre(d) {
       var index = filter.genre.indexOf(d);
       (index < 0)
         ? filter.genre.push(d)
         : filter.genre.splice(index, 1);
+      $(this).toggleClass('strike');
+      graph.render();
+    }
+
+    function toggleSubgenre(d) {
+      var index = filter.subgenre.indexOf(d.name);
+      (index < 0)
+        ? filter.subgenre.push(d.name)
+        : filter.subgenre.splice(index, 1);
       $(this).toggleClass('strike');
       graph.render();
     }

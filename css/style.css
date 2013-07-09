@@ -64,7 +64,7 @@ path {
   cursor: pointer;
   line-height: 1.5em;
   width: 50%;
-  display: inline-block;
+  display: inline-block
 }
 
 .genre text {
@@ -78,6 +78,16 @@ path {
   display: inline-block;
   margin-right: 1em;
   margin-left: 1em;
+}
+
+.control-subgenres ul {
+  width: 100%;
+}
+.subgenre {
+  cursor: pointer;
+  line-height: 1.5em;
+  width: 13em;
+  display: inline-block
 }
 
 .strike { 
