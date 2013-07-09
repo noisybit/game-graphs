@@ -179,10 +179,15 @@ graph = (function(graph) {
         $(this).attr('style', '');
       })
 
+    // Sort subgenres by length
+    var s = g.entries().sort(function(a, b) {
+      return b.value.length - a.value.length
+    })
+
     // Setup the subgenre controls
     var subul = d3.select('.control-subgenres')
           .selectAll('ul')
-          .data(g.entries())
+          .data(s)
             .enter()
               .append('ul')
 
