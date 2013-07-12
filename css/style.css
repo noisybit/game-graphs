@@ -57,13 +57,13 @@ path {
 }
 
 .control-genres ul {
-  width: 30em;
+  width: 49%;
 }
 
 .genre {
   cursor: pointer;
   line-height: 1.5em;
-  width: 50%;
+  width: 13em;
   display: inline-block
 }
 
