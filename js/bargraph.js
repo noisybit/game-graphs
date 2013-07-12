@@ -58,7 +58,7 @@ graph = (function(graph) {
       svg.attr('width', this.width + margin.left + margin.right)
       x.rangeBands([0, this.width], 0.1);
       xLabel.rangeBands([0, this.width])
-      svg.select('xAxis text').attr('x', this.width/2 - margin.left)
+      svg.select('.xAxis > text').attr('x', this.width/2 - margin.left)
     }
 
     function render(data) {
