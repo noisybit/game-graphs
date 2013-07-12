@@ -53,6 +53,14 @@ graph = (function(graph) {
         .style('text-anchor', 'start')
         .text(options.yLabel);
 
+    function resize() {
+      this.width = window.innerWidth - margin.left - margin.right;
+      svg.attr('width', this.width + margin.left + margin.right)
+      x.rangeBands([0, this.width], 0.1);
+      xLabel.rangeBands([0, this.width])
+      svg.select('xAxis text').attr('x', this.width/2 - margin.left)
+    }
+
     function render(data) {
 
         var xLabelDomain = data.filter(function(d, i, arr) {
@@ -103,6 +111,7 @@ graph = (function(graph) {
       xAxis: xAxis,
       yAxis: yAxis,
       xLabel: xLabel,
+      resize: resize,
       render: render
   };
 

@@ -149,6 +149,13 @@ graph = (function(graph) {
       $('.control-ratings').find('.lower').text(filter.ratings[0]);
       $('.control-ratings').find('.upper').text(filter.ratings[1]);
 
+      $(window).resize(function() {
+        console.log('resize');
+        graph.reviews.resize();
+        graph.ratings.resize();
+        graph.render();
+      })
+
       graph.render();
 
 
