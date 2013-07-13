@@ -150,13 +150,17 @@ graph = (function(graph) {
       $('.control-ratings').find('.upper').text(filter.ratings[1]);
 
       $(window).resize(function() {
-        console.log('resize');
         graph.reviews.resize();
         graph.ratings.resize();
         graph.render();
       })
 
       graph.render();
+
+      d3.selectAll('svg')
+          .on('touchstart', graph.touchstartTooltip)
+          .on('touchmove', graph.touchmoveTooltip)
+          .on('touchend', graph.touchendTooltip)
 
 
     });
@@ -263,14 +267,47 @@ graph = (function(graph) {
     $tooltip.hide()
   }
 
-  graph.moveTooltip = function() {
-    var yOffset = d3.event.pageY-10;
-    var xOffset = d3.event.pageX+10;
+  graph.moveTooltip = function(above) {
     var width = $tooltip[0].scrollWidth;
+    var height = $tooltip[0].scrollHeight;
+    var yOffset = d3.event.pageY - height;
+    var xOffset = d3.event.pageX+10;
     if(width + xOffset > window.innerWidth) 
       $tooltip.css('top', yOffset+"px").css('left', (xOffset - 20 - width)+"px")
     else
       $tooltip.css('top', yOffset+"px").css('left', xOffset+"px")
+  }
+
+  graph.touchstartTooltip = function(d, i) {
+    $tooltip.show();
+  }
+
+  graph.touchmoveTooltip = function(d, i) {
+    var touches = d3.touches(this);
+    var svg = $(this);
+    var bar = svg.find('.bar');
+    var width = svg.attr('width');
+    var x = touches[0][0];
+    if(touches.length > 1 || x > width) return; //multi-touch event
+    var el = bar[Math.floor(x/(width/bar.length))];
+    var d = d3.select(el).datum()
+    $tooltip.find('.game-title').html(d.title);
+    timeout = setTimeout(function() {
+      $tooltip.find('.game-boxart').attr('src', d.boxart);
+    }, 25);
+    $tooltip.find('.game-rating').html(d.rating);
+    $tooltip.find('.game-reviews').html(d.reviews);
+    $tooltip.show();
+
+    graph.moveTooltip(true);
+  }
+
+  graph.touchendTooltip = function(d, i) {
+    console.log('TouchEnd')
+    $(document).on('touchstart', function(e) {
+      $tooltip.hide();
+      $(this).off(e);
+    })
   }
 
   return graph;

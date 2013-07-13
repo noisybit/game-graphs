@@ -99,8 +99,8 @@ path {
   position: absolute;
   border-radius: 3px;
   padding: 0.5em;
-  max-width: 25em;
-  min-width: 20em;
+  max-width: 40%;
+  min-width: 35%;
   z-index: 100;
   background-color: gainsboro;
   -webkit-box-shadow: 2px 2px 9px 0px #000;
