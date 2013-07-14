@@ -74,6 +74,7 @@ graph = (function(graph) {
     controls.onSlide = function(e, ui) {
       var $h3 = $(this).prev();
       var label = $h3.find('.slider-label').text().toLowerCase();
+      if(label === 'score') label = 'ratings'
       var unique = slider[label];   
       var lower = unique[ui.values[1]];
       var upper = unique[ui.values[0]];
