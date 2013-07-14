@@ -113,8 +113,8 @@ graph = (function(graph) {
 
       graph.reviews = graph.bargraph({
         svg: '#reviews',
-        xLabel: 'Reviews',
-        yLabel: 'Ratings',
+        xLabel: '# of Reviews',
+        yLabel: 'Score',
         xSelector: 'reviews',
         yMax: 'rating',
         yInput: 'rating'
@@ -122,8 +122,8 @@ graph = (function(graph) {
 
       graph.ratings = graph.bargraph({
         svg: '#ratings',
-        xLabel: 'Ratings',
-        yLabel: 'Reviews',
+        xLabel: 'Score',
+        yLabel: '# of Reviews',
         xSelector: 'rating',
         yMax: 'reviews',
         yInput: 'reviews'
